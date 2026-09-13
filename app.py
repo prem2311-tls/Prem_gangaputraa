@@ -13,7 +13,601 @@ def get_db():
     conn.row_factory = sqlite3.Row
     return conn
 
+@app.route("/typing")
+def typing():
+    return page("""
+<style>
+.typing-wrap{
+    max-width:1100px;
+    margin:40px auto;
+    padding:20px;
+}
+.typing-title{
+    text-align:center;
+    font-size:clamp(32px,6vw,64px);
+    font-weight:900;
+    letter-spacing:2px;
+    margin-bottom:8px;
+}
+.typing-sub{
+    text-align:center;
+    opacity:.7;
+    margin-bottom:30px;
+}
+.game-panel{
+    background:rgba(10,18,25,.88);
+    border:1px solid rgba(0,255,180,.25);
+    border-radius:24px;
+    padding:25px;
+    box-shadow:0 0 40px rgba(0,255,180,.08);
+}
+.levels{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    justify-content:center;
+    margin-bottom:25px;
+}
+.level-btn{
+    border:1px solid rgba(0,255,180,.25);
+    background:#091119;
+    color:#9fffe0;
+    padding:10px 15px;
+    border-radius:12px;
+    cursor:pointer;
+}
+.level-btn.active{
+    background:#00c98b;
+    color:#00130d;
+    font-weight:800;
+}
+.level-btn.locked{
+    opacity:.35;
+    cursor:not-allowed;
+}
+.stats{
+    display:grid;
+    grid-template-columns:repeat(6,1fr);
+    gap:10px;
+    margin-bottom:25px;
+}
+.stat{
+    background:#071018;
+    border:1px solid rgba(0,255,180,.15);
+    border-radius:15px;
+    padding:14px;
+    text-align:center;
+}
+.stat small{
+    display:block;
+    opacity:.55;
+    margin-bottom:5px;
+}
+.stat strong{
+    font-size:20px;
+}
+.target-box{
+    min-height:170px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    background:radial-gradient(circle,#0b2420,#050b10 65%);
+    border:1px solid rgba(0,255,180,.18);
+    border-radius:20px;
+    margin-bottom:20px;
+}
+.target-label{
+    font-size:12px;
+    letter-spacing:3px;
+    opacity:.5;
+}
+.target{
+    font-size:clamp(30px,7vw,65px);
+    font-weight:900;
+    color:#7dffd7;
+    text-shadow:0 0 20px rgba(0,255,180,.45);
+    margin-top:12px;
+    word-break:break-word;
+    text-align:center;
+    padding:0 15px;
+}
+#typingInput{
+    width:100%;
+    box-sizing:border-box;
+    padding:18px;
+    border-radius:15px;
+    border:1px solid rgba(0,255,180,.3);
+    background:#03080c;
+    color:#fff;
+    outline:none;
+    font-size:20px;
+    text-align:center;
+}
+#typingInput:focus{
+    border-color:#00e6a0;
+    box-shadow:0 0 20px rgba(0,255,180,.15);
+}
+.controls{
+    display:flex;
+    gap:12px;
+    justify-content:center;
+    flex-wrap:wrap;
+    margin-top:18px;
+}
+.game-btn{
+    border:0;
+    border-radius:13px;
+    padding:13px 22px;
+    cursor:pointer;
+    font-weight:800;
+    background:#00d995;
+    color:#00150e;
+}
+.game-btn.secondary{
+    background:#111c25;
+    color:#9fffe0;
+    border:1px solid rgba(0,255,180,.2);
+}
+.message{
+    text-align:center;
+    min-height:25px;
+    margin-top:15px;
+    color:#9fffe0;
+}
+.progress{
+    height:8px;
+    background:#111a20;
+    border-radius:20px;
+    overflow:hidden;
+    margin-top:20px;
+}
+.progress-bar{
+    height:100%;
+    width:0%;
+    background:#00d995;
+    transition:.25s;
+}
+.instructions{
+    margin-top:25px;
+    padding:18px;
+    border-radius:15px;
+    background:#071018;
+    border:1px solid rgba(0,255,180,.1);
+    opacity:.8;
+    line-height:1.7;
+}
+@media(max-width:750px){
+    .stats{
+        grid-template-columns:repeat(3,1fr);
+    }
+}
+@media(max-width:430px){
+    .typing-wrap{padding:10px}
+    .game-panel{padding:15px}
+    .stats{gap:6px}
+    .stat{padding:10px 5px}
+}
+</style>
 
+<div class="typing-wrap">
+
+    <div class="typing-title">PREM TYPING QUEST</div>
+    <div class="typing-sub">
+        Train your speed. Build your accuracy. Become a typing pro.
+    </div>
+
+    <div class="game-panel">
+
+        <div class="levels" id="levels"></div>
+
+        <div class="stats">
+            <div class="stat">
+                <small>LEVEL</small>
+                <strong id="levelName">Beginner</strong>
+            </div>
+            <div class="stat">
+                <small>❤️ LIVES</small>
+                <strong id="lives">3</strong>
+            </div>
+            <div class="stat">
+                <small>⚡ SCORE</small>
+                <strong id="score">0</strong>
+            </div>
+            <div class="stat">
+                <small>🔥 COMBO</small>
+                <strong id="combo">0</strong>
+            </div>
+            <div class="stat">
+                <small>🚀 WPM</small>
+                <strong id="wpm">0</strong>
+            </div>
+            <div class="stat">
+                <small>🎯 ACCURACY</small>
+                <strong id="accuracy">100%</strong>
+            </div>
+        </div>
+
+        <div class="target-box">
+            <div class="target-label">MISSION TARGET</div>
+            <div class="target" id="target">PRESS START</div>
+        </div>
+
+        <input
+            id="typingInput"
+            type="text"
+            placeholder="Type the target and press ENTER..."
+            autocomplete="off"
+            autocapitalize="none"
+            spellcheck="false"
+            disabled
+        >
+
+        <div class="progress">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+
+        <div class="message" id="message">
+            Select a level and start your mission.
+        </div>
+
+        <div class="controls">
+            <button class="game-btn" id="startBtn">
+                START MISSION
+            </button>
+
+            <button class="game-btn secondary" id="resetBtn">
+                RESET PROGRESS
+            </button>
+        </div>
+
+        <div class="instructions">
+            <b>🎮 HOW TO PLAY</b><br>
+            1. Choose an unlocked level.<br>
+            2. Press <b>START MISSION</b>.<br>
+            3. Type the displayed word exactly.<br>
+            4. Press <b>ENTER</b> to submit.<br>
+            5. Correct words give XP, score and combo.<br>
+            6. Wrong words cost a life.<br>
+            7. Complete the level to unlock the next one.
+        </div>
+
+    </div>
+</div>
+
+<script>
+const levels = [
+    {
+        name:"Beginner",
+        words:[
+            "home","key","type","game","fast",
+            "jump","code","mouse","screen","play"
+        ],
+        wordsToWin:6
+    },
+    {
+        name:"Basic",
+        words:[
+            "keyboard","practice","letter","laptop",
+            "button","window","system","school",
+            "student","computer"
+        ],
+        wordsToWin:7
+    },
+    {
+        name:"Intermediate",
+        words:[
+            "python","terminal","browser","program",
+            "network","server","website","database",
+            "linux","developer"
+        ],
+        wordsToWin:8
+    },
+    {
+        name:"Advanced",
+        words:[
+            "authentication","encryption","protocol",
+            "firewall","database","security",
+            "authorization","monitoring","password",
+            "configuration"
+        ],
+        wordsToWin:9
+    },
+    {
+        name:"Pro",
+        words:[
+            "cybersecurity","cryptography","vulnerability",
+            "infrastructure","penetration","defensive",
+            "architecture","authentication",
+            "networksecurity","securedevelopment"
+        ],
+        wordsToWin:10
+    },
+    {
+        name:"Elite",
+        words:[
+            "cybersecurity engineer",
+            "secure authentication",
+            "network monitoring",
+            "defensive security",
+            "secure development",
+            "incident response",
+            "security architecture",
+            "digital protection",
+            "threat detection",
+            "security operations"
+        ],
+        wordsToWin:12
+    }
+];
+
+let currentLevel = 0;
+let unlocked = Number(localStorage.getItem("premTypingUnlocked") || 1);
+
+let score = 0;
+let xp = 0;
+let combo = 0;
+let lives = 3;
+let completed = 0;
+let correctChars = 0;
+let totalTyped = 0;
+let startTime = 0;
+let timer = null;
+let playing = false;
+let target = "";
+
+const levelName = document.getElementById("levelName");
+const livesEl = document.getElementById("lives");
+const scoreEl = document.getElementById("score");
+const comboEl = document.getElementById("combo");
+const wpmEl = document.getElementById("wpm");
+const accuracyEl = document.getElementById("accuracy");
+const targetEl = document.getElementById("target");
+const input = document.getElementById("typingInput");
+const message = document.getElementById("message");
+const progressBar = document.getElementById("progressBar");
+const levelsEl = document.getElementById("levels");
+
+function renderLevels(){
+    levelsEl.innerHTML = "";
+
+    levels.forEach((level,index)=>{
+        const btn = document.createElement("button");
+        btn.className = "level-btn";
+
+        if(index === currentLevel){
+            btn.classList.add("active");
+        }
+
+        if(index >= unlocked){
+            btn.classList.add("locked");
+            btn.textContent = "🔒 " + level.name;
+            btn.disabled = true;
+        }else{
+            btn.textContent = "⚡ " + level.name;
+        }
+
+        btn.onclick = ()=>{
+            if(!playing){
+                currentLevel = index;
+                updateUI();
+                renderLevels();
+                message.textContent =
+                    level.name + " selected. Press START MISSION.";
+            }
+        };
+
+        levelsEl.appendChild(btn);
+    });
+}
+
+function randomTarget(){
+    const words = levels[currentLevel].words;
+    target = words[Math.floor(Math.random() * words.length)];
+    targetEl.textContent = target;
+    input.value = "";
+    input.focus();
+}
+
+function updateUI(){
+    levelName.textContent = levels[currentLevel].name;
+    livesEl.textContent = lives;
+    scoreEl.textContent = score;
+    comboEl.textContent = combo;
+
+    const accuracy = totalTyped === 0
+        ? 100
+        : Math.round((correctChars / totalTyped) * 100);
+
+    accuracyEl.textContent = Math.max(0,accuracy) + "%";
+
+    if(startTime){
+        const minutes = (Date.now() - startTime) / 60000;
+
+        if(minutes > 0){
+            const words = correctChars / 5;
+            wpmEl.textContent = Math.round(words / minutes);
+        }
+    }
+
+    const needed = levels[currentLevel].wordsToWin;
+    progressBar.style.width =
+        Math.min(100,(completed / needed) * 100) + "%";
+}
+
+function startGame(){
+    score = 0;
+    xp = 0;
+    combo = 0;
+    lives = 3;
+    completed = 0;
+    correctChars = 0;
+    totalTyped = 0;
+    startTime = Date.now();
+    playing = true;
+
+    input.disabled = false;
+    document.getElementById("startBtn").textContent = "RESTART MISSION";
+
+    message.textContent =
+        "MISSION STARTED — TYPE THE TARGET!";
+
+    randomTarget();
+    updateUI();
+    renderLevels();
+
+    clearInterval(timer);
+
+    timer = setInterval(()=>{
+        if(playing){
+            updateUI();
+        }
+    },500);
+}
+
+function submitWord(){
+    if(!playing) return;
+
+    const typed = input.value.trim();
+
+    if(!typed){
+        return;
+    }
+
+    totalTyped += typed.length;
+
+    if(typed === target){
+
+        correctChars += target.length;
+
+        combo++;
+
+        const multiplier = Math.min(combo,10);
+        const gained = 100 * multiplier;
+
+        score += gained;
+        xp += 10;
+
+        completed++;
+
+        message.textContent =
+            "✓ CORRECT +" + gained + " XP +" + (10 * multiplier);
+
+        if(completed >= levels[currentLevel].wordsToWin){
+            finishLevel();
+            return;
+        }
+
+        randomTarget();
+
+    }else{
+
+        lives--;
+        combo = 0;
+
+        message.textContent =
+            "✗ WRONG — Life lost. Try again!";
+
+        input.value = "";
+
+        if(lives <= 0){
+            gameOver();
+            return;
+        }
+
+        input.focus();
+    }
+
+    updateUI();
+}
+
+function finishLevel(){
+    playing = false;
+    clearInterval(timer);
+    input.disabled = true;
+
+    score += 500;
+    xp += 100;
+
+    const next = currentLevel + 1;
+
+    if(next < levels.length && unlocked <= next){
+        unlocked = next + 1;
+        localStorage.setItem(
+            "premTypingUnlocked",
+            unlocked
+        );
+    }
+
+    updateUI();
+    renderLevels();
+
+    if(next < levels.length){
+        message.textContent =
+            "🏆 LEVEL COMPLETE! " +
+            levels[next].name +
+            " UNLOCKED!";
+    }else{
+        message.textContent =
+            "👑 ELITE COMPLETE! YOU BEAT TYPING QUEST!";
+    }
+
+    targetEl.textContent = "MISSION COMPLETE";
+}
+
+function gameOver(){
+    playing = false;
+    clearInterval(timer);
+    input.disabled = true;
+
+    message.textContent =
+        "💥 GAME OVER — Press START MISSION to try again.";
+
+    targetEl.textContent = "GAME OVER";
+
+    updateUI();
+}
+
+document.getElementById("startBtn").onclick = startGame;
+
+input.addEventListener("keydown",(event)=>{
+    if(event.key === "Enter"){
+        event.preventDefault();
+        submitWord();
+    }
+});
+
+document.getElementById("resetBtn").onclick = ()=>{
+    if(playing){
+        message.textContent =
+            "Finish the current mission first.";
+        return;
+    }
+
+    localStorage.removeItem("premTypingUnlocked");
+
+    unlocked = 1;
+    currentLevel = 0;
+
+    score = 0;
+    combo = 0;
+    lives = 3;
+    completed = 0;
+    correctChars = 0;
+    totalTyped = 0;
+
+    targetEl.textContent = "PRESS START";
+    message.textContent =
+        "Progress reset. Beginner is unlocked.";
+
+    updateUI();
+    renderLevels();
+};
+
+renderLevels();
+updateUI();
+</script>
+""")
 def init_db():
     conn = get_db()
 
