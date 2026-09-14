@@ -1,10 +1,13 @@
+import os
 from flask import Flask, request, redirect, session
+
 from werkzeug.security import generate_password_hash, check_password_hash
 import sqlite3
 
 app = Flask(__name__)
-app.secret_key = "prem-secure-change-this-key"
-
+app.config["PERMANENT_SESSION_LIFETIME"] = 60 * 60 * 24 * 30
+app.config["SESSION_PERMANENT"] = True
+app.secret_key = os.environ.get("SECRET_KEY", "prem-local-development-key")
 DATABASE = "users.db"
 
 
@@ -1406,7 +1409,7 @@ def login():
             user["password"],
             password
         ):
-
+            session.permanent = True
             session["username"] = username
 
             return redirect("/dashboard")
