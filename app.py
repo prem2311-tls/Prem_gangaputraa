@@ -611,6 +611,193 @@ renderLevels();
 updateUI();
 </script>
 """)
+@app.route("/cyber-hub")
+def cyber_hub():
+    return page("""
+<style>
+.hub{max-width:1150px;margin:auto;padding:25px}
+.hub-hero{text-align:center;padding:35px 10px}
+.hub-hero h1{font-size:46px;margin:0}
+.hub-hero p{opacity:.75}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.stat,.game{padding:20px;border:1px solid rgba(0,255,255,.2);
+border-radius:18px;background:rgba(10,20,35,.7)}
+.stat b{font-size:28px}
+.games{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+gap:16px;margin-top:25px}
+.game{transition:.2s}
+.game:hover{transform:translateY(-5px);border-color:#00ffff}
+.icon{font-size:40px}
+.game button{padding:10px 16px;border:0;border-radius:10px;
+cursor:pointer;font-weight:bold}
+.progress{height:10px;background:#182331;border-radius:10px;overflow:hidden}
+.bar{height:100%;width:0;background:#00ffff}
+.badges{display:flex;gap:10px;flex-wrap:wrap;margin-top:15px}
+.badge{padding:10px 14px;border-radius:20px;background:#172535}
+.daily{margin-top:25px;padding:22px;border-radius:18px;
+border:1px solid rgba(255,255,255,.15)}
+@media(max-width:650px){
+.stats{grid-template-columns:repeat(2,1fr)}
+.hub-hero h1{font-size:34px}
+}
+</style>
+
+<div class="hub">
+
+<div class="hub-hero">
+<h1>⚡ CYBER COMMAND</h1>
+<p>Your personal cybersecurity training headquarters.</p>
+</div>
+
+<div class="stats">
+<div class="stat">⚡ XP<br><b id="xp">0</b></div>
+<div class="stat">🏆 Level<br><b id="level">1</b></div>
+<div class="stat">🎮 Played<br><b id="played">0</b></div>
+<div class="stat">🔥 Streak<br><b id="streak">0</b></div>
+</div>
+
+<div class="daily">
+<h2>🎯 Daily Cyber Challenge</h2>
+<p id="challenge"></p>
+<button onclick="completeDaily()">Complete Challenge</button>
+</div>
+
+<h2>🎮 Cyber Arcade</h2>
+<div class="games">
+
+<div class="game"><div class="icon">⌨️</div><h2>Typing Quest</h2>
+<p>Improve cybersecurity typing skills.</p>
+<a href="/typing"><button>PLAY</button></a></div>
+
+<div class="game"><div class="icon">🎣</div><h2>Phishing Detective</h2>
+<p>Find suspicious clues in fictional messages.</p>
+<button onclick="play('Phishing Detective')">PLAY</button></div>
+
+<div class="game"><div class="icon">🔐</div><h2>Password Defender</h2>
+<p>Build strong fictional passwords.</p>
+<button onclick="play('Password Defender')">PLAY</button></div>
+
+<div class="game"><div class="icon">🐞</div><h2>Bug Hunter</h2>
+<p>Find bugs in safe example code.</p>
+<button onclick="play('Bug Hunter')">PLAY</button></div>
+
+<div class="game"><div class="icon">🌐</div><h2>Network Defender</h2>
+<p>Identify simulated network events.</p>
+<button onclick="play('Network Defender')">PLAY</button></div>
+
+<div class="game"><div class="icon">🐧</div><h2>Linux Command Quest</h2>
+<p>Learn beginner Linux commands.</p>
+<button onclick="play('Linux Command Quest')">PLAY</button></div>
+
+<div class="game"><div class="icon">🔢</div><h2>Crypto Puzzle</h2>
+<p>Solve safe encoding puzzles.</p>
+<button onclick="play('Crypto Puzzle')">PLAY</button></div>
+
+<div class="game"><div class="icon">🧠</div><h2>Cyber Quiz Battle</h2>
+<p>Test your cybersecurity knowledge.</p>
+<button onclick="play('Cyber Quiz Battle')">PLAY</button></div>
+
+<div class="game"><div class="icon">🕵️</div><h2>Digital Forensics</h2>
+<p>Investigate fictional digital evidence.</p>
+<button onclick="play('Digital Forensics')">PLAY</button></div>
+
+<div class="game"><div class="icon">🧩</div><h2>Code Breaker</h2>
+<p>Crack logic-based puzzles.</p>
+<button onclick="play('Code Breaker')">PLAY</button></div>
+
+<div class="game"><div class="icon">🚨</div><h2>SOC Alert Rush</h2>
+<p>Classify simulated security alerts.</p>
+<button onclick="play('SOC Alert Rush')">PLAY</button></div>
+
+<div class="game"><div class="icon">🛡️</div><h2>Firewall Architect</h2>
+<p>Design a fictional defensive rule set.</p>
+<button onclick="play('Firewall Architect')">PLAY</button></div>
+
+<div class="game"><div class="icon">🗺️</div><h2>Cyber Map</h2>
+<p>Explore fictional network architecture.</p>
+<button onclick="play('Cyber Map')">PLAY</button></div>
+
+<div class="game"><div class="icon">🔎</div><h2>URL Detective</h2>
+<p>Spot suspicious characteristics in fictional URLs.</p>
+<button onclick="play('URL Detective')">PLAY</button></div>
+
+<div class="game"><div class="icon">💾</div><h2>Data Recovery</h2>
+<p>Reconstruct fictional corrupted data.</p>
+<button onclick="play('Data Recovery')">PLAY</button></div>
+
+<div class="game"><div class="icon">🤖</div><h2>AI Security Lab</h2>
+<p>Explore safe AI-security scenarios.</p>
+<button onclick="play('AI Security Lab')">PLAY</button></div>
+
+<div class="game"><div class="icon">🧠</div><h2>Cyber Memory</h2>
+<p>Match cybersecurity concepts.</p>
+<button onclick="play('Cyber Memory')">PLAY</button></div>
+
+<div class="game"><div class="icon">🏆</div><h2>Cyber Boss Battle</h2>
+<p>Final multi-stage cybersecurity challenge.</p>
+<button onclick="play('Cyber Boss Battle')">PLAY</button></div>
+
+</div>
+
+<h2>🏅 Achievements</h2>
+<div class="badges">
+<div class="badge">🔰 Rookie</div>
+<div class="badge">⌨️ Speed Coder</div>
+<div class="badge">🛡️ Defender</div>
+<div class="badge">🔎 Investigator</div>
+<div class="badge">⚡ Cyber Master</div>
+</div>
+
+<h2>📊 Progress</h2>
+<div class="progress"><div class="bar" id="bar"></div></div>
+
+</div>
+
+<script>
+let xp=Number(localStorage.getItem("cyberXP")||0);
+let played=Number(localStorage.getItem("cyberPlayed")||0);
+let streak=Number(localStorage.getItem("cyberStreak")||0);
+
+const challenges=[
+"Identify 3 signs of a suspicious message.",
+"Name 3 ways to protect an account.",
+"Explain what a firewall does.",
+"Identify a safe password practice.",
+"Name 3 useful Linux commands."
+];
+
+document.getElementById("challenge").textContent=
+challenges[new Date().getDate()%challenges.length];
+
+function update(){
+document.getElementById("xp").textContent=xp;
+document.getElementById("played").textContent=played;
+document.getElementById("streak").textContent=streak;
+document.getElementById("level").textContent=Math.floor(xp/100)+1;
+document.getElementById("bar").style.width=(xp%100)+"%";
+
+localStorage.setItem("cyberXP",xp);
+localStorage.setItem("cyberPlayed",played);
+localStorage.setItem("cyberStreak",streak);
+}
+
+function play(name){
+played++;
+xp+=25;
+alert(name+" completed! +25 XP");
+update();
+}
+
+function completeDaily(){
+xp+=50;
+streak++;
+alert("Daily Challenge complete! +50 XP");
+update();
+}
+
+update();
+</script>
+""")
 def init_db():
     conn = get_db()
 
@@ -635,6 +822,7 @@ def page(content):
         <a href="/">Home</a>
         <a href="/dashboard">Dashboard</a>
         <a href="/games">🎮 Cyber Arcade</a>
+        <a href="/cyber-hub">⚡ Cyber Command</a>
         <a href="/logout">Logout</a>
         """
     else:
