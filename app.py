@@ -1587,7 +1587,132 @@ def logout():
 
     return redirect("/")
 
+@app.route("/games")
+def games():
+    return page("""
+<style>
+.arcade-wrap{
+    max-width:1100px;
+    margin:40px auto;
+    padding:20px;
+}
+.arcade-title{
+    text-align:center;
+    font-size:42px;
+    margin-bottom:10px;
+}
+.arcade-sub{
+    text-align:center;
+    opacity:.75;
+    margin-bottom:35px;
+}
+.arcade-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+    gap:20px;
+}
+.game-card{
+    padding:24px;
+    border:1px solid rgba(0,255,255,.25);
+    border-radius:18px;
+    background:rgba(10,20,35,.7);
+    transition:.2s;
+}
+.game-card:hover{
+    transform:translateY(-5px);
+    border-color:#00ffff;
+}
+.game-icon{
+    font-size:42px;
+}
+.game-card h2{
+    margin:12px 0 8px;
+}
+.game-card p{
+    opacity:.75;
+    min-height:45px;
+}
+.game-btn{
+    display:inline-block;
+    margin-top:12px;
+    padding:10px 16px;
+    border-radius:10px;
+    text-decoration:none;
+    background:#00ffff;
+    color:#001014;
+    font-weight:bold;
+}
+</style>
 
+<div class="arcade-wrap">
+
+    <div class="arcade-title">🎮 CYBER ARCADE</div>
+
+    <div class="arcade-sub">
+        Train your cybersecurity skills through interactive challenges.
+    </div>
+
+    <div class="arcade-grid">
+
+        <div class="game-card">
+            <div class="game-icon">⌨️</div>
+            <h2>Typing Quest</h2>
+            <p>Improve your typing speed through cybersecurity-themed levels.</p>
+            <a class="game-btn" href="/typing">Play</a>
+        </div>
+
+        <div class="game-card">
+            <div class="game-icon">🎣</div>
+            <h2>Phishing Detective</h2>
+            <p>Learn to identify suspicious messages and fictional phishing clues.</p>
+            <a class="game-btn" href="/games#phishing">Play</a>
+        </div>
+
+        <div class="game-card">
+            <div class="game-icon">🔐</div>
+            <h2>Password Defender</h2>
+            <p>Learn the basics of creating strong passwords.</p>
+            <a class="game-btn" href="/games#password">Play</a>
+        </div>
+
+        <div class="game-card">
+            <div class="game-icon">🐞</div>
+            <h2>Bug Hunter</h2>
+            <p>Find fictional bugs in safe example code.</p>
+            <a class="game-btn" href="/games#bugs">Play</a>
+        </div>
+
+        <div class="game-card">
+            <div class="game-icon">🌐</div>
+            <h2>Network Defender</h2>
+            <p>Practice identifying safe and suspicious network events.</p>
+            <a class="game-btn" href="/games#network">Play</a>
+        </div>
+
+        <div class="game-card">
+            <div class="game-icon">🐧</div>
+            <h2>Linux Command Quest</h2>
+            <p>Learn useful Linux commands through simple challenges.</p>
+            <a class="game-btn" href="/games#linux">Play</a>
+        </div>
+
+        <div class="game-card">
+            <div class="game-icon">🔢</div>
+            <h2>Crypto Puzzle</h2>
+            <p>Solve beginner-friendly encoding and logic puzzles.</p>
+            <a class="game-btn" href="/games#crypto">Play</a>
+        </div>
+
+        <div class="game-card">
+            <div class="game-icon">🧠</div>
+            <h2>Cyber Quiz Battle</h2>
+            <p>Test your cybersecurity knowledge with quick questions.</p>
+            <a class="game-btn" href="/games#quiz">Play</a>
+        </div>
+
+    </div>
+</div>
+""")
 init_db()
 
 
